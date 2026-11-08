@@ -1,0 +1,65 @@
+name: Validate plugin entry
+
+# Checks a pull request that adds a plugin to community-plugins.json, and
+# comments the result on the pull request. Modelled on the check
+# obsidianmd/obsidian-releases ran for plugin submissions.
+#
+# SECURITY: `pull_request_target` runs with this repository's token, so the
+# validator comes from the BASE branch (base/), and the pull request's files
+# (pr/) are only ever read as JSON data — never executed, installed or built.
+on:
+  pull_request_target:
+    branches: [main]
+    paths:
+      - community-plugins.json
+
+permissions:
+  contents: read
+  pull-requests: write # comment the result
+
+concurrency:
+  group: validate-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out the base branch (trusted validator)
+        uses: actions/checkout@v4
+        with:
+          path: base
+          persist-credentials: false
+      - name: Check out the pull request (data only)
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ github.event.pull_request.number }}/head
+          path: pr
+          persist-credentials: false
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: List changed files
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh pr diff "$PR" --repo "$GITHUB_REPOSITORY" --name-only > changed-files.txt
+      - name: Validate
+        id: validate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          BASE_DIR: base
+          PR_DIR: pr
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+          # Passed through the environment, never interpolated into the script.
+          PR_BODY: ${{ github.event.pull_request.body }}
+          REPORT_FILE: report.md
+        run: |
+          printf '%s' "$PR_BODY" > pr-body.txt
+          CHANGED_FILES="$(cat changed-files.txt)" PR_BODY_FILE=pr-body.txt node base/scripts/validate-plugin-entry.mjs
+      - name: Comment the result
+        if: always() && hashFiles('report.md') != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR: ${{ github.event.pull_request.number }}
+        run: gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file report.md --edit-last || gh pr comment "$PR" --repo "$GITHUB_REPOSITORY" --body-file report.md

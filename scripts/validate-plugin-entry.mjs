@@ -1,7 +1,5 @@
-// Validates a pull request that adds a plugin to community-plugins.json —
-// the MindOs counterpart of the check obsidianmd/obsidian-releases ran on
-// plugin submissions (validate-plugin-entry.yml, retired in May 2026 when
-// Obsidian moved submissions to its own website).
+// Validates a pull request that adds a plugin to community-plugins.json
+// (run by validate-plugin-entry.yml).
 //
 // SECURITY: this runs from a `pull_request_target` workflow, which has a
 // token for the registry repository. It must never execute anything from
@@ -241,7 +239,7 @@ export function createGitHubReader(token, fetchImpl = fetch) {
       return data ? { private: Boolean(data.private), archived: Boolean(data.archived), hasIssues: Boolean(data.has_issues) } : null
     },
     async isOrgMember(org, user) {
-      // 204 only for PUBLIC members when asked without org permissions — the same rule Obsidian used.
+      // 204 only for PUBLIC members when asked without org permissions.
       return Boolean(await api(`/orgs/${encodeURIComponent(org)}/public_members/${encodeURIComponent(user)}`))
     },
     getHeadFile: (repo, path) => raw(`https://raw.githubusercontent.com/${repo}/HEAD/${path}`),

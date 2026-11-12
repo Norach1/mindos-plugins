@@ -2,7 +2,7 @@
 
 This repository is the directory of community plugins for MindOs. MindOs reads it to fill **Settings → Plugins → Browse**.
 
-It works like Obsidian's [`obsidian-releases`](https://github.com/obsidianmd/obsidian-releases): it lists plugins and **points to their GitHub repositories**. It holds no plugin code, versions, download links or checksums. Each author publishes releases in their own repository, and MindOs downloads them from there. An update never needs a change here.
+It lists plugins and **points to their GitHub repositories**. It holds no plugin code, versions, download links or checksums. Each author publishes releases in their own repository, and MindOs downloads them from there. An update never needs a change here.
 
 ## Files
 

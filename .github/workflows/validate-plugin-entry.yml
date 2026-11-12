@@ -1,8 +1,7 @@
 name: Validate plugin entry
 
 # Checks a pull request that adds a plugin to community-plugins.json, and
-# comments the result on the pull request. Modelled on the check
-# obsidianmd/obsidian-releases ran for plugin submissions.
+# comments the result on the pull request.
 #
 # SECURITY: `pull_request_target` runs with this repository's token, so the
 # validator comes from the BASE branch (base/), and the pull request's files

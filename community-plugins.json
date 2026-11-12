@@ -1,1 +1,4 @@
 []
+{ "id": "mood-tracker", "name": "Mood Tracker", "author": "Norach1",
+  "description": "Log how you feel each day, see your mood over the last weeks and write a mood summary note.",
+  "repo": "Norach1/mood-tracker" }
